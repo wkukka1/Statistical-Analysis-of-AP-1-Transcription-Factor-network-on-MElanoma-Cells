@@ -1,0 +1,57 @@
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message = FALSE}
+library(tidyverse)
+```
+
+```{r}
+data <- read.csv(file = "STA130_Course_Project.csv")
+```
+```{r}
+data1 <- data %>% filter(drug_id == 1 & dose_id == 2 & Rep == 1)
+```
+```{r}
+time0.5 <- data1 %>% filter(Timepoint == "0.5 h")
+time2 <- data1 %>% filter(Timepoint == "2 h")
+time6 <- data1 %>% filter(Timepoint == "6 h")
+time15 <- data1 %>% filter(Timepoint == "15 h")
+time24 <- data1 %>% filter(Timepoint == "24 h")
+time72 <- data1 %>% filter(Timepoint == "72 h")
+time120 <- data1 %>% filter(Timepoint == "120 h")
+```
+```{r}
+cor(time0.5$ATF6,time0.5$NGFR)
+cor(time2$ATF6,time2$NGFR)
+cor(time6$ATF6,time6$NGFR)
+cor(time15$c_Fos,time15$NGFR)
+cor(time24$c_Fos,time24$NGFR)
+cor(time72$c_Jun,time72$NGFR)
+cor(time120$ATF2,time120$NGFR)
+
+```
+```{r}
+time0.5 %>%
+  ggplot(aes(x = ATF6, y = NGFR)) +
+  geom_point()
+time2 %>%
+  ggplot(aes(x = ATF6, y = NGFR)) +
+  geom_point()
+time6 %>%
+  ggplot(aes(x = ATF6, y = NGFR)) +
+  geom_point()
+time15 %>%
+  ggplot(aes(x = c_Fos, y = NGFR)) +
+  geom_point()
+time24 %>%
+  ggplot(aes(x = c_Fos, y = NGFR)) +
+  geom_point()
+time72 %>%
+  ggplot(aes(x = c_Jun, y = NGFR)) +
+  geom_point()
+time120 %>%
+  ggplot(aes(x = ATF2, y = NGFR)) +
+  geom_point()
+```

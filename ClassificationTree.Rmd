@@ -1,0 +1,316 @@
+---
+title: "ClassificationTree"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# echo=FALSE will stop the code chunk from appearing in the knit document
+# warning=FALSE and message=FALSE will stop R messages from appearing in the knit document
+library(tidyverse)
+
+library(rpart)
+library(partykit)
+protein <- read_csv("STA130_Course_Project.csv")
+course_project <- protein
+course_project_ori <- protein
+```
+
+## Results of the Classification tree at time 0.5h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '0.5 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(NGFR ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 2h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '2 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(NGFR ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of Classification tree at time 6h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '6 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(NGFR ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 15h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '15 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(NGFR ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 24h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '24 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(NGFR ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 72h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '72 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(NGFR ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+
+## Results of the Classification tree at time '120 h'
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '120 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(NGFR ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 0.5h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '0.5 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 2h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '2 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of Classification tree at time 6h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '6 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 15h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '15 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 24h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '24 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+## Results of the Classification tree at time 72h
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '72 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+
+
+## Results of the Classification tree at time '120 h'
+```{r include=FALSE}
+course_project_2 <- course_project_ori %>% filter(Timepoint == '120 h', 
+                                                  drug_id == 1, dose_id == 2, 
+                                                  Rep == 1)
+
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project_2)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+```
+```{r echo=FALSE}
+barplot(t(tree$variable.importance),horiz=TRUE)
+```
+

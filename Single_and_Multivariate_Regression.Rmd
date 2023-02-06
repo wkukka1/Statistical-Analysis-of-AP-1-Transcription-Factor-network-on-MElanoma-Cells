@@ -1,0 +1,288 @@
+---
+title: "Course Project"
+author: "Zeyuan Zhuang"
+date: "2022/11/7"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("partykit")
+library(rpart)
+library(partykit)
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+course_project <- read_csv('STA130_Course_Project.csv')
+```
+
+
+
+```{r}
+og <- course_project
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=ATF2, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+ATF2_model <- lm(Sox10 ~ ATF2, data = course_project)
+summary(ATF2_model)$coefficients
+summary(ATF2_model)$coefficients
+summary(ATF2_model)$r.squared
+cor(course_project$ATF2,course_project$Sox10)
+```
+
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=ATF5, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+ATF5_model <- lm(Sox10 ~ ATF5, data = course_project)
+summary(ATF5_model)$coefficients
+summary(ATF5_model)$coefficients
+summary(ATF5_model)$r.squared
+cor(course_project$ATF5,course_project$Sox10)
+```
+
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=Phospho_ATF2, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Phospho_ATF2_model <- lm(Sox10 ~ Phospho_ATF2, data = course_project)
+summary(Phospho_ATF2_model)$coefficients
+summary(Phospho_ATF2_model)$coefficients
+summary(Phospho_ATF2_model)$r.squared
+cor(course_project$Phospho_ATF2,course_project$Sox10)
+```
+
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=ATF6, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+ATF6_model <- lm(Sox10 ~ ATF6, data = course_project)
+summary(ATF6_model)$coefficients
+summary(ATF6_model)$coefficients
+summary(ATF6_model)$r.squared
+cor(course_project$ATF6,course_project$Sox10)
+```
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=c_Jun, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+c_Jun_model <- lm(Sox10 ~ c_Jun, data = course_project)
+summary(c_Jun_model)$coefficients
+summary(c_Jun_model)$coefficients
+summary(c_Jun_model)$r.squared
+cor(course_project$c_Jun,course_project$Sox10)
+```
+```{r}
+course_project %>% ggplot(aes(x=c_Fos, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+c_Fos_model <- lm(Sox10 ~ c_Fos, data = course_project)
+summary(c_Fos_model)$coefficients
+summary(c_Fos_model)$r.squared
+cor(course_project$Sox10, course_project$c_Fos)
+```
+```{r}
+course_project %>% ggplot(aes(x=NF_kappaB, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+NF_kappaB_model <- lm(Sox10 ~ NF_kappaB, data = course_project)
+summary(NF_kappaB_model)$coefficients
+summary(NF_kappaB_model)$r.squared
+cor(course_project$Sox10, course_project$NF_kappaB)
+```
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=Phospho_ATF1, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Phospho_ATF1_model <- lm(Sox10 ~ Phospho_ATF1, data = course_project)
+summary(Phospho_ATF1_model)$coefficients
+summary(Phospho_ATF1_model)$coefficients
+summary(Phospho_ATF1_model)$r.squared
+cor(course_project$Phospho_ATF1,course_project$Sox10)
+```
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=Phospho_c_Jun, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Phospho_c_Jun_model <- lm(Sox10 ~ Phospho_c_Jun, data = course_project)
+summary(Phospho_c_Jun_model)$coefficients
+summary(Phospho_c_Jun_model)$coefficients
+summary(Phospho_c_Jun_model)$r.squared
+cor(course_project$Phospho_c_Jun,course_project$Sox10)
+```
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+
+course_project %>% ggplot(aes(x=Phospho_Erk1, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Phospho_Erk1_model <- lm(Sox10 ~ Phospho_Erk1, data = course_project)
+summary(Phospho_Erk1_model)$coefficients
+summary(Phospho_Erk1_model)$coefficients
+summary(Phospho_Erk1_model)$r.squared
+cor(course_project$Phospho_Erk1,course_project$Sox10)
+```
+
+
+```{r}
+set.seed(130)
+n <- nrow(course_project)
+training_indices <- sample(1:n, size=round(0.8*n)) 
+course_project1 <-course_project %>% rowid_to_column()
+train <- course_project1 %>% filter(rowid %in% training_indices) 
+y_train <- train$Sox10
+test <- course_project1 %>% filter(!(rowid %in% training_indices)) 
+y_test <- test$Sox10
+model1_train <- lm(Sox10 ~ ATF2, data = train)
+model2_train <- lm(Sox10 ~ ATF5, data = train)
+model3_train <- lm(Sox10 ~ ATF6, data = train)
+model4_train <- lm(Sox10 ~ Phospho_ATF1, data = train)
+model5_train <- lm(Sox10 ~ Phospho_ATF2, data = train)
+model6_train <- lm(Sox10 ~ Phospho_c_Jun, data = train)
+model7_train <- lm(Sox10 ~ c_Fos, data = train)
+model8_train <- lm(Sox10 ~ Phospho_Erk1, data = train)
+model9_train <- lm(Sox10 ~ c_Jun, data = train)
+model10_train <- lm(Sox10 ~ NF_kappaB, data = train)
+yhat_model1_test <- predict(model1_train, newdata=test)
+yhat_model2_test <- predict(model2_train, newdata=test)
+yhat_model3_test <- predict(model3_train, newdata=test)
+yhat_model4_test <- predict(model4_train, newdata=test)
+yhat_model5_test <- predict(model5_train, newdata=test)
+yhat_model6_test <- predict(model6_train, newdata=test)
+yhat_model7_test <- predict(model7_train, newdata=test)
+yhat_model8_test <- predict(model8_train, newdata=test)
+yhat_model9_test <- predict(model9_train, newdata=test)
+yhat_model10_test <- predict(model10_train, newdata=test)
+model1_test_RMSE <- sqrt(mean((y_test-yhat_model1_test)^2))
+model2_test_RMSE <- sqrt(mean((y_test-yhat_model2_test)^2))
+model3_test_RMSE <- sqrt(mean((y_test-yhat_model3_test)^2))
+model4_test_RMSE <- sqrt(mean((y_test-yhat_model4_test)^2))
+model5_test_RMSE <- sqrt(mean((y_test-yhat_model5_test)^2))
+model6_test_RMSE <- sqrt(mean((y_test-yhat_model6_test)^2))
+model7_test_RMSE <- sqrt(mean((y_test-yhat_model7_test)^2))
+model8_test_RMSE <- sqrt(mean((y_test-yhat_model8_test)^2))
+model9_test_RMSE <- sqrt(mean((y_test-yhat_model9_test)^2))
+model10_test_RMSE <- sqrt(mean((y_test-yhat_model10_test)^2))
+
+
+yhat_model1_train <- predict(model1_train, newdata=train) 
+yhat_model2_train <- predict(model2_train, newdata=train) 
+yhat_model3_train <- predict(model3_train, newdata=train) 
+yhat_model4_train <- predict(model4_train, newdata=train)
+yhat_model5_train <- predict(model5_train, newdata=train)
+yhat_model6_train <- predict(model6_train, newdata=train) 
+yhat_model7_train <- predict(model7_train, newdata=train) 
+yhat_model8_train <- predict(model8_train, newdata=train)
+yhat_model9_train <- predict(model9_train, newdata=train)
+yhat_model10_train <- predict(model10_train, newdata=train) 
+ 
+model1_train_RMSE <- sqrt(mean((y_train-yhat_model1_train)^2)) 
+model2_train_RMSE <- sqrt(mean((y_train-yhat_model2_train)^2)) 
+model3_train_RMSE <- sqrt(mean((y_train-yhat_model3_train)^2)) 
+model4_train_RMSE <- sqrt(mean((y_train-yhat_model4_train)^2))
+model5_train_RMSE <- sqrt(mean((y_train-yhat_model5_train)^2)) 
+model6_train_RMSE <- sqrt(mean((y_train-yhat_model6_train)^2)) 
+model7_train_RMSE <- sqrt(mean((y_train-yhat_model7_train)^2)) 
+model8_train_RMSE <- sqrt(mean((y_train-yhat_model8_train)^2))
+model9_train_RMSE <- sqrt(mean((y_train-yhat_model9_train)^2)) 
+model10_train_RMSE <- sqrt(mean((y_train-yhat_model10_train)^2)) 
+ 
+
+
+mytable <- tibble(Model = c("Model 1","Model 2","Model 3","Model 4","Model 5","Model 6","Model 7","Model 8","Model 9","Model 10"),RMSE_testdata = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE),RMSE_traindata = c(model1_train_RMSE,model2_train_RMSE,model3_train_RMSE,model4_train_RMSE,model5_train_RMSE,model6_train_RMSE,model7_train_RMSE,model8_train_RMSE,model9_train_RMSE,model10_train_RMSE))
+
+```
+```{r}
+
+```
+
+```{r}
+#skdfajdf
+mytable %>% ggplot() + labs(x="Model", y="RMSE") + geom_point(aes(x=Model, y=RMSE_testdata, color="Test")) + geom_point(aes(x=Model, y=RMSE_traindata, color="Train"))
+
+tibble(rmse_test = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE),
+           rmse_train = c(model1_train_RMSE,model2_train_RMSE,model3_train_RMSE,model4_train_RMSE,model5_train_RMSE,model6_train_RMSE,model7_train_RMSE,model8_train_RMSE,model9_train_RMSE,model10_train_RMSE)) %>% 
+  mutate(rmse_train/rmse_test)
+
+```
+```{r}
+ggplot(mytable, aes(x= Model, y= RMSE_testdata)) + geom_bar(stat = 'identity') + labs(y= "RMSE Score", x = "Model Number")
+```
+```{r}
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+course_project %>% ggplot(aes(x=ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Multi <- lm(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, data = course_project)%>% tidy()%>%select(term,estimate,p.value)
+Multi
+summary(lm(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, data = course_project))$coefficients
+
+
+set.seed(268)
+n <- nrow(course_project)
+training_indices <- sample(1:n, size=round(0.8*n)) 
+train <- course_project %>% filter(rowid %in% training_indices) 
+y_train <- train$Sox10
+test <- course_project %>% filter(!(rowid %in% training_indices)) 
+y_test <- test$Sox10
+multimodel_train <- lm(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, data = train)
+yhat_multimodel_test <- predict(multimodel_train, newdata=test)
+multimodel_test_RMSE <- sqrt(mean((y_test-yhat_multimodel_test)^2))
+yhat_multimodel_train <- predict(multimodel_train, newdata=train) 
+multimodel_train_RMSE <- sqrt(mean((y_train-yhat_model1_train)^2)) 
+
+mytable <- tibble(Model = c("multiModel"),RMSE_testdata = c(multimodel_test_RMSE),RMSE_traindata = c(multimodel_train_RMSE))
+mytable %>% rowid_to_column() %>% ggplot() + labs(x="Model", y="RMSE") + geom_point(aes(x=rowid, y=RMSE_testdata, color="Test")) + geom_point(aes(x=rowid, y=RMSE_traindata, color="Train"))
+
+tibble(rmse_test = c(multimodel_test_RMSE),
+           rmse_train = c(multimodel_train_RMSE)) %>% 
+  mutate(rmse_train/rmse_test)
+```
+```{r}
+course_project %>% select(Phospho_c_Jun,Phospho_ATF1,Phospho_ATF2,ATF2,ATF5	,ATF6,c_Jun,	Phospho_c_Jun,NF_kappaB,c_Fos,Sox10) %>% glimpse()
+```
+```{r}
+
+tree <- rpart(Sox10~Phospho_c_Jun+Phospho_ATF1+Phospho_ATF2+ATF2+ATF5	+ATF6+c_Jun+Phospho_c_Jun+NF_kappaB+c_Fos,data=course_project)
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+barplot(t(tree$variable.importance),horiz=FALSE)
+```
+```{r}
+set.seed(1002); train_ids <- sample(1:n, size=round(0.8*n))
+train <- course_project %>% filter(rowid %in% train_ids)
+test <- course_project %>% filter(!(rowid %in% train_ids))
+tree <- rpart(Sox10 ~ Phospho_c_Jun+Phospho_ATF1+Phospho_ATF2+ATF2+ATF5	+ATF6+c_Jun+Phospho_c_Jun+NF_kappaB+c_Fos, data=train)
+tree %>% as.party() %>% plot(type="extended",tp_args=list(id=FALSE))
+
+```
+
+```{r}
+og <- og %>% filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+set.seed(268)
+n <- nrow(og)
+training_indices <- sample(1:n, size=round(0.8*n)) 
+train <- og %>% filter(rowid %in% training_indices) 
+y_train <- train$Sox10
+test <- og %>% filter(!(rowid %in% training_indices)) 
+y_test <- test$Sox10
+tree <- rpart(Sox10~ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, data= train)
+plot(as.party(tree), gp=gpar(cex=1), type="simple")
+barplot(t(tree$variable.importance),horiz=FALSE)
+```

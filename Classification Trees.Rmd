@@ -1,0 +1,226 @@
+---
+title: "Course Project"
+author: "Zeyuan Zhuang"
+date: "2022/11/7"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+course_project <- read_csv('STA130_Course_Project.csv')
+course_project_1 <- course_project
+course_project <- course_project %>% 
+  filter(timepoint_id == 1, drug_id == 1, dose_id == 2, Rep == 1)
+```
+
+```{r}
+name <- c('ATF2', 'ATF3', 'ATF4', 'ATF5', 'Phospho_ATF1', 'Phospho_ATF2', 'Phospho_ATF4', 'ATF6', 'JunB', 'c_Jun', 'JunD', 'Phospho_S6', "Phospho_c_Jun", "Phospho_Erik1", "NF_KappaB", "Fra1", "Fra2", "c_Fos", "KI_67", "Phpspho_Fra1", "Phospho_c_Fos", "Phospho_p38")
+
+correlation <- c(cor(course_project$Sox10, course_project$ATF2), cor(course_project$ATF3,course_project$Sox10), cor(course_project$ATF4,course_project$Sox10), cor(course_project$ATF5,course_project$Sox10), cor(course_project$Phospho_ATF1,course_project$Sox10), cor(course_project$Phospho_ATF2,course_project$Sox10), cor(course_project$Phospho_ATF4,course_project$Sox10), cor(course_project$ATF6,course_project$Sox10), cor(course_project$JunB,course_project$Sox10), cor(course_project$c_Jun,course_project$Sox10), cor(course_project$JunD,course_project$Sox10), cor(course_project$Sox10, course_project$Phospho_S6), cor(course_project$Sox10, course_project$Phospho_c_Jun), cor(course_project$Sox10, course_project$Phospho_Erk1), cor(course_project$Sox10, course_project$NF_kappaB), cor(course_project$Sox10, course_project$Fra1), cor(course_project$Sox10, course_project$Fra2), cor(course_project$Sox10, course_project$c_Fos), cor(course_project$Sox10, course_project$Ki_67), cor(course_project$Sox10, course_project$Phospho_Fra1), cor(course_project$Sox10, course_project$Phospho_c_Fos), cor(course_project$Sox10, course_project$Phospho_p38))
+
+tibble(name, correlation) %>% arrange(desc(correlation))
+```
+# As we find out ATF4 has the largest correlation.
+
+```{r}
+course_project %>% ggplot(aes(x=ATF4, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Phospho_c_Fos_model <- lm(Sox10 ~ ATF4, data = course_project)
+summary(Phospho_c_Fos_model)$coefficients
+summary(Phospho_c_Fos_model)$r.squared
+```
+
+```{r}
+course_project %>% ggplot(aes(x=ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, y=Sox10)) + geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Multi <- lm(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, data = course_project)
+Multi %>% tidy() %>% select(term,estimate,p.value)
+summary(Multi)$r.squared
+summary(Multi)$coefficient
+```
+
+# The estimate for ATF4 is the highest.
+```{r}
+set.seed(130)
+n <- nrow(course_project)
+training_indices <- sample(1:n, size=round(0.8*n)) 
+course_project <-course_project %>% rowid_to_column()
+train <- course_project %>% filter(rowid %in% training_indices) 
+y_train <- train$Sox10
+test <- course_project %>% filter(!(rowid %in% training_indices)) 
+y_test <- test$Sox10
+model1_train <- lm(Sox10 ~ ATF2, data = train)
+model2_train <- lm(Sox10 ~ ATF3, data = train)
+model3_train <- lm(Sox10 ~ ATF4, data = train)
+model4_train <- lm(Sox10 ~ ATF5, data = train)
+model5_train <- lm(Sox10 ~ Phospho_ATF1, data = train)
+model6_train <- lm(Sox10 ~ Phospho_ATF2, data = train)
+model7_train <- lm(Sox10 ~ Phospho_ATF4, data = train)
+model8_train <- lm(Sox10 ~ ATF6, data = train)
+model9_train <- lm(Sox10 ~ JunB, data = train)
+model10_train <- lm(Sox10 ~ JunD, data = train)
+model11_train <- lm(Sox10 ~ JunD, data = train)
+model_1 <- lm(Sox10 ~ Phospho_S6, data = train)
+model_2 <- lm(Sox10 ~ Phospho_c_Jun, data = train)
+model_3 <- lm(Sox10 ~ Phospho_Erk1, data = train)
+model_4 <- lm(Sox10 ~ NF_kappaB, data = train)
+model_5 <- lm(Sox10 ~ Fra1, data = train)
+model_6 <- lm(Sox10 ~ Fra2, data = train)
+model_7 <- lm(Sox10 ~ c_Fos, data = train)
+model_8 <- lm(Sox10 ~ Ki_67, data = train)
+model_9 <- lm(Sox10 ~ Phospho_Fra1, data = train)
+model_10 <- lm(Sox10 ~ Phospho_c_Fos, data = train)
+model_11 <- lm(Sox10 ~ Phospho_p38, data = train)
+
+yhat_model1_test <- predict(model1_train, newdata=test)
+yhat_model2_test <- predict(model2_train, newdata=test)
+yhat_model3_test <- predict(model3_train, newdata=test)
+yhat_model4_test <- predict(model4_train, newdata=test)
+yhat_model5_test <- predict(model5_train, newdata=test)
+yhat_model6_test <- predict(model6_train, newdata=test)
+yhat_model7_test <- predict(model7_train, newdata=test)
+yhat_model8_test <- predict(model8_train, newdata=test)
+yhat_model9_test <- predict(model9_train, newdata=test)
+yhat_model10_test <- predict(model10_train, newdata=test)
+yhat_model11_test <- predict(model11_train, newdata=test)
+yhat_test_1 <- predict(model_1, newdata = test)
+yhat_test_2 <- predict(model_2, newdata = test)
+yhat_test_3 <- predict(model_3, newdata = test)
+yhat_test_4 <- predict(model_4, newdata = test)
+yhat_test_5 <- predict(model_5, newdata = test)
+yhat_test_6 <- predict(model_6, newdata = test)
+yhat_test_7 <- predict(model_7, newdata = test)
+yhat_test_8 <- predict(model_8, newdata = test)
+yhat_test_9 <- predict(model_9, newdata = test)
+yhat_test_10 <- predict(model_10, newdata = test)
+yhat_test_11 <- predict(model_11, newdata = test)
+
+model1_test_RMSE <- sqrt(mean((y_test-yhat_model1_test)^2))
+model2_test_RMSE <- sqrt(mean((y_test-yhat_model2_test)^2))
+model3_test_RMSE <- sqrt(mean((y_test-yhat_model3_test)^2))
+model4_test_RMSE <- sqrt(mean((y_test-yhat_model4_test)^2))
+model5_test_RMSE <- sqrt(mean((y_test-yhat_model5_test)^2))
+model6_test_RMSE <- sqrt(mean((y_test-yhat_model6_test)^2))
+model7_test_RMSE <- sqrt(mean((y_test-yhat_model7_test)^2))
+model8_test_RMSE <- sqrt(mean((y_test-yhat_model8_test)^2))
+model9_test_RMSE <- sqrt(mean((y_test-yhat_model9_test)^2))
+model10_test_RMSE <- sqrt(mean((y_test-yhat_model10_test)^2))
+model11_test_RMSE <- sqrt(mean((y_test-yhat_model11_test)^2))
+model12_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_1)^2))
+model13_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_2)^2))
+model14_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_3)^2))
+model15_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_4)^2))
+model16_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_5)^2))
+model17_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_6)^2))
+model18_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_7)^2))
+model19_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_8)^2))
+model20_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_9)^2))
+model21_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_10)^2))
+model22_test_RMSE <- sqrt(mean((test$Sox10 - yhat_test_11)^2))
+
+
+Model <- c("Model_1","Model 2","Model 3","Model 4","Model 5","Model 6","Model 7","Model 8","Model 9","Model 10","Model 11")
+mytable <- tibble(Model, RMSE_testdata = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE,model11_test_RMSE),RMSE_traindata = c(model1_train_RMSE,model2_train_RMSE,model3_train_RMSE,model4_train_RMSE,model5_train_RMSE,model6_train_RMSE,model7_train_RMSE,model8_train_RMSE,model9_train_RMSE,model10_train_RMSE,model11_train_RMSE))
+mytable %>% rowid_to_column() %>% ggplot() + labs(x="Model", y="RMSE") + geom_point(aes(x=rowid, y=RMSE_testdata, color="Test")) + geom_point(aes(x=rowid, y=RMSE_traindata, color="Train"))
+
+
+tibble(name, rmse_test = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE,model11_test_RMSE, model12_test_RMSE, model13_test_RMSE, model14_test_RMSE, model15_test_RMSE, model16_test_RMSE, model17_test_RMSE, model18_test_RMSE, model19_test_RMSE, model20_test_RMSE, model21_test_RMSE, model22_test_RMSE)) %>% arrange(rmse_test)
+```
+# As we find out the RMSE value for ATF4 is the lowest.
+
+```{r}
+set.seed(268)
+n <- nrow(course_project)
+training_indices <- sample(1:n, size=round(0.8*n)) 
+train <- course_project %>% filter(rowid %in% training_indices) 
+y_train <- train$Sox10
+test <- course_project %>% filter(!(rowid %in% training_indices)) 
+y_test <- test$Sox10
+multimodel_train <- lm(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, data = train)
+yhat_multimodel_test <- predict(multimodel_train, newdata=test)
+multimodel_test_RMSE <- sqrt(mean((y_test-yhat_multimodel_test)^2))
+yhat_multimodel_train <- predict(multimodel_train, newdata=train) 
+multimodel_train_RMSE <- sqrt(mean((y_train-yhat_model1_train)^2)) 
+
+mytable <- tibble(Model = c("multiModel"),RMSE_testdata = c(multimodel_test_RMSE),RMSE_traindata = c(multimodel_train_RMSE))
+mytable %>% rowid_to_column() %>% ggplot() + labs(x="Model", y="RMSE") + geom_point(aes(x=rowid, y=RMSE_testdata, color="Test")) + geom_point(aes(x=rowid, y=RMSE_traindata, color="Train"))
+
+tibble(rmse_test = c(multimodel_test_RMSE),
+           rmse_train = c(multimodel_train_RMSE)) %>% 
+  mutate(rmse_train/rmse_test)
+```
+
+
+```{r}
+library(rpart)
+course_project
+tree <- rpart(course_project$Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+
+                Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+```
+```{r}
+set.seed(1002); train_ids <- sample(1:n, size=round(0.8*n))
+train <- course_project %>% filter(rowid %in% train_ids)
+test <- course_project %>% filter(!(rowid %in% train_ids))
+tree <- rpart(Sox10 ~ ATF2+ATF3+ATF4+ATF5+Phospho_ATF1+Phospho_ATF2+
+                Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+Phospho_S6+Phospho_c_Jun+
+                Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, data=train)
+tree %>% as.party() %>% plot(type="extended",tp_args=list(id=FALSE))
+```
+
+```{r}
+course_project %>% ggplot(aes(x=ATF4 + c_Fos + Phospho_c_Fos, y=Sox10)) + 
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE)
+Prediction_model <- lm(Sox10 ~ ATF4 + c_Fos + Phospho_c_Fos, 
+                       data = course_project)
+summary(Prediction_model)$coefficients
+summary(Prediction_model)$r.squared
+```
+
+```{r}
+tree <- rpart(course_project$MiTFg ~ ATF2+ATF3+ATF4+ATF5+
+                Phospho_ATF1+Phospho_ATF2+Phospho_ATF4+ATF6+JunB+	c_Jun+JunD+
+                Phospho_S6+Phospho_c_Jun+Phospho_Erk1+NF_kappaB+Fra1+Fra2+
+                c_Fos+Ki_67+Phospho_Fra1+Phospho_c_Fos+Phospho_p38, 
+              data=course_project)
+tree %>% as.party() %>% plot(type="simple",
+tp_args = list(FUN = function(info) list(format(info$prediction), format(paste("n =",info$n)),
+format(paste(round(info$err,0.0001),"% err",sep="")))))
+```
+

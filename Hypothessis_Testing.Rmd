@@ -1,0 +1,1096 @@
+---
+title: "STA_project"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+```
+```{r}
+protein <- read_csv("STA130_Course_Project.csv")
+```
+```{r}
+head(protein)
+
+timepoints <- list(c('2 h', '6 h', '15 h', '24 h', '72 h', '120 h'))
+protein_2 <- protein %>% filter(drug_id == 1, Rep == 1, dose_id == 2)
+protein <- protein %>% filter(drug_id == 1, Rep == 1, dose_id == 2)
+```
+
+$H_0$: the protein level experimental condition x does not change over time 
+$H_1$: The protein levels in the experimental condition x does change over time
+
+```{r}
+#Phospho_c_Fos
+set.seed(70)
+inital_value <- protein_2 %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_c_Fos))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein_2 %>% 
+  filter(Timepoint == '120 h')%>% 
+  summarise(mean = mean(Phospho_c_Fos) - inital)
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein_2 %>%
+    select(Phospho_c_Fos, Sox10, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(dose_id == 2, Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_c_Fos = sample(Phospho_c_Fos))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_c_Fos))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_c_Fos))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+
+```
+```{r}
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_c_Jun))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_c_Jun) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_c_Jun, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_c_Jun = sample(Phospho_c_Jun))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_c_Jun))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_c_Jun))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value # the p-value is 0 so we can reject the null hypothesis 
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Phospho_ATF2
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_ATF2))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_ATF2) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_ATF2, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_ATF2 = sample(Phospho_ATF2))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_ATF2))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_ATF2))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Phospho_ATF1
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_ATF1))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '24 h') %>% 
+  summarise(mean = mean(Phospho_ATF1) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_ATF1, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '24 h') %>%
+    mutate(Phospho_ATF1 = sample(Phospho_ATF1))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_ATF1))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '24 h') %>% 
+    summarise(avg = mean(Phospho_ATF1))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+sim %>% summarise(mean = mean(median_diff), .groups = NULL)
+test_stat
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+
+
+
+```{r}
+#This tests Phospho_ATF4
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_ATF4))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_ATF4) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_ATF4, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(dose_id == 2, Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_ATF4 = sample(Phospho_ATF4))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_ATF4))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_ATF4))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+```
+```{r}
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests ATF2
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(ATF2))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(ATF2) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(ATF2, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(ATF2 = sample(ATF2))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(ATF2))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(ATF2))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+```{r}
+#This tests ATF3
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(ATF3))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(ATF3) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(ATF3, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(ATF3 = sample(ATF3))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(ATF3))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(ATF3))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests ATF4
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(ATF4))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(ATF4) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(ATF4, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(ATF4 = sample(ATF4))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(ATF4))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(ATF4))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests ATF5
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(ATF5))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(ATF5) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(ATF5, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(ATF5 = sample(ATF5))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(ATF5))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(ATF5))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+```{r}
+
+```
+```{r}
+#TODO FIX THIS 
+#This tests ATF6
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(ATF6))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '24 h') %>% 
+  summarise(mean = mean(ATF6) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(ATF6, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '24 h') %>%
+    mutate(ATF6 = sample(ATF6))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(ATF6))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '24 h') %>% 
+    summarise(avg = mean(ATF6))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests JunB
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(JunB))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(JunB) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(JunB, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(JunB = sample(JunB))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(JunB))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(JunB))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests c_Jun
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(c_Jun))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(c_Jun) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(c_Jun, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(c_Jun = sample(c_Jun))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(c_Jun))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(c_Jun))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests JunD
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(JunD))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(JunD) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(JunD, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(JunD = sample(JunD))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(JunD))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(JunD))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Phospho_S6
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_S6))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_S6) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_S6, Timepoint, drug_id, Rep, dose_id) %>%
+    filter( Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_S6 = sample(Phospho_S6))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_S6))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_S6))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Phospho_c_Jun
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_c_Jun))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_c_Jun) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_c_Jun, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_c_Jun = sample(Phospho_c_Jun))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_c_Jun))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_c_Jun))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Phospho_Erk1
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_Erk1))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_Erk1) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_Erk1, Timepoint, drug_id, Rep, dose_id) %>%
+    filter( Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_Erk1 = sample(Phospho_Erk1))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_Erk1))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_Erk1))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests NF_kappaB
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(NF_kappaB))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(NF_kappaB) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(NF_kappaB, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(NF_kappaB = sample(NF_kappaB))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(NF_kappaB))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(NF_kappaB))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Fra1
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Fra1))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Fra1) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Fra1, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Fra1 = sample(Fra1))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Fra1))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Fra1))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Fra2
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Fra2))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Fra2) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Fra2, Timepoint, drug_id, Rep, dose_id) %>%
+    filter( Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Fra2 = sample(Fra2))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Fra2))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Fra2))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests c_Fos
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(c_Fos))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(c_Fos) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(c_Fos, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(c_Fos = sample(c_Fos))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(c_Fos))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(c_Fos))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Ki_67	
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Ki_67	))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Ki_67) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Ki_67, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Ki_67 = sample(Ki_67	))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Ki_67))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Ki_67))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Phospho_Fra1	
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_Fra1))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_Fra1) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_Fra1, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_Fra1 = sample(Phospho_Fra1	))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_Fra1))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_Fra1))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+
+```{r}
+#This tests Phospho_p38	
+inital_value <- protein %>% 
+  filter(Timepoint == '0.5 h') %>%
+  summarise(mean = mean(Phospho_p38))
+inital <- as.numeric(inital_value)
+
+test_stat <- protein %>% 
+  filter(Timepoint == '120 h') %>% 
+  summarise(mean = mean(Phospho_p38) - inital)
+test_stat
+
+N <- 500 # Change this to 10000 if a finer simulation resolution is required 
+simulated_xbars = 1
+set.seed(70)
+for(i in 1:N){
+  simdata <- protein %>%
+    select(Phospho_p38, Timepoint, drug_id, Rep, dose_id) %>%
+    filter(Timepoint == '0.5 h'| Timepoint == '120 h') %>%
+    mutate(Phospho_p38 = sample(Phospho_p38	))
+  
+  sim_x <- simdata %>%
+    filter(Timepoint == '0.5 h') %>% 
+    summarise(avg = mean(Phospho_p38))
+  sim_2h <- simdata %>% 
+    filter(Timepoint == '120 h') %>% 
+    summarise(avg = mean(Phospho_p38))
+    
+  simulated_xbars[i] <- as.numeric(sim_2h$avg) - as.numeric(sim_x$avg)
+}
+tibble("xbar" = simulated_xbars) %>% 
+  ggplot(aes(x= xbar)) + geom_histogram(bins = 50)
+
+sim <- tibble(median_diff = simulated_xbars)
+num_more_extreme <- sim %>% filter(abs(median_diff) >= abs(test_stat)) %>% summarise(n())
+sim %>% ggplot(aes(x=median_diff)) + geom_histogram(binwidth=1, color="black", fill="gray")
+sim
+
+num_more_extreme
+p_value <- as.numeric(num_more_extreme / N)
+p_value
+
+difference <- abs(test_stat - mean(sim$median_diff))
+difference
+```
+```{r}
+Name <- c('ATF2',	'ATF3',	'ATF4',	'ATF5',	'Phospho_ATF1',	'Phospho_ATF2',	'Phospho_ATF4', 'ATF6',	'JunB',	'c_Jun',	'JunD', 'Phospho_S6',	'Phospho_c_Jun', 'Phospho_Erk1', 'NF_kappaB',	'Fra1',	'Fra2',	'c_Fos', 'Ki_67',	'Phospho_Fra1',	'Phospho_c_Fos', 'Phospho_p38')
+P_value <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+data.frame(Name, P_value)
+```

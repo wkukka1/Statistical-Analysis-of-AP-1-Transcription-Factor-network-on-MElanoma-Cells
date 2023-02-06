@@ -1,0 +1,468 @@
+---
+title: "Statistical Analyisis on the AP-1 transcription factor network on Melanoma cells"
+author: "Will Kukkamalla, Tianliang Bai, Zeyuan Zhuang, Caullin Seale "
+
+date: 'Dec 3, 2022'
+output: 
+  beamer_presentation:
+    theme: "Pittsburgh"
+    colortheme: "orchid"
+    fonttheme: "structurebold"
+    slide_level: 2
+classoption: "aspectratio=169"
+fontsize: 11pt
+urlcolor: blue
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# echo=FALSE will stop the code chunk from appearing in the knit document
+# warning=FALSE and message=FALSE will stop R messages from appearing in the knit document
+library(tidyverse)
+library(rpart)
+library(partykit)
+protein <- read_csv("STA130_Course_Project.csv")
+course_project <- protein
+course_project_ori <- protein
+data <- protein
+```
+
+## Introduction
+
+In this presentation we will be analyzing the effect of AP-1 transcription factors on the cellular plasticity in melanoma cells. We will use multiple statistical methods to observe the relations between the transcription factors and the phenotype indicators.
+
+## Objectives 
+
+What is "good" homeostasis?
+
+What is "bad" homeostasis?
+
+how can "bad" cellular homeostasis be changed to be good?
+
+## Data Summary 
+We will be analyzing all 22 transcription factors and the effects on the phenotype indicator Sox10 and NGFR. This is because Sox10 is responsible for marking malignant melanoma cells and NGFR is a tumor suppressor. 
+
+Controls: Rep = 1, drug id = 1, dose id = 1
+```{r, echo=FALSE,fig.dim = c(8, 6), out.width = "50%", out.height="50%"}
+
+protein %>% filter(Rep == 1, dose_id == 2, drug_id == 1) %>% select(Rep, dose_id, drug_id, Phospho_c_Fos,NGFR, Sox10
+, Phospho_p38, ATF6,	JunB,	c_Jun,	JunD) %>% glimpse()
+
+```
+
+## Homeostasis
+
+We have decided to define good homeostasis as when the cellular phenotype is undifferentiated or melanocytic.
+
+We define bad homeostasis as when the cellular phenotype is transitory or Neural-crest-like.
+
+Thus to turn "bad" cellular homeostasis to "good" homeostasis the phenotype must go from transitory or Neural-crest-like to undifferentiated or melanocytic to do this we must find out what transcription factors best lend to increacing the precense of the NFGR protein.
+
+
+## Statistical Methods: Two Sample Hypothesis Test
+
+We decided to do a 2 sample hypothesis test on 22 transcription factors. Our variables: $\alpha  = 0.01$, $\mu_{1}$ = the mean protein level in x transcription factor at time 0.5h, $\mu_{2}$ = the mean protein level in x transcription factor at time 120h
+
+$H_0: \mu_{1} = \mu_{2}$
+
+$H_A :\mu_{1} \neq \mu_{2}$
+
+This will be a two tailed test to determine whether or not the transcription factors protein level changes over time.
+
+## Statistical Methods: Regression
+
+We decided to create multiple linear regression models to predict the phenotypical outcomes from the transcription factors.
+
+The reason we did Regression was to answer the question:Can we predict cellular phenotypical outcomes  values/states from transcription factors?
+
+We took the 9 smallest differences from the observed and simulated values from the transcription factors over time and made multiple models to decide if at least one had a RMSE value of under 0.3. 
+
+## Statisitical Methods: Classification Trees
+
+We decided to create classification trees to answer the question:At time  in experimental condition , what TF are most predictive of cellular values/states
+
+In order the determine what the best transcription factor is for determining the cellular phenotype we have decided to create classification trees.
+
+We took all the transcription factors and made a classification tree in order at different times to see which transcription factor is the best predictor for each time.
+
+To determine the best transcription factor we took the one being used as the first split.  
+
+## Statistical Methods: Correlation
+After using the Classification trees to determine the most predictive Transcription factor for NGFR and Sox10 we then created models to analyze the correlation between the most predictive transcription factor and the NGFR and Sox10.
+
+The purpose of which is to answer the question at different timepoints how does the transcription factor correlate with the protein level of the NGFR and Sox10.
+
+Since NGFR aids in tumor suppression and sox10 marks malignant melanoma cells  answering this will give us insight on how we can turn "bad" homeostasis into "good" homeostasis.
+
+## Results of Two Sample Hypothesis tests
+
+:::columns
+
+::::column
+P-value for each Transcription Factor
+```{r echo=FALSE}
+Name <- c('ATF2',	'ATF3',	'ATF4',	'ATF5',	'Phospho_ATF1',	'Phospho_ATF2',	'Phospho_ATF4', 'ATF6',	'JunB',	'c_Jun')
+P_value <- c(0,0,0,0,0,0,0,0,0,0)
+df <- tibble(data.frame(Name, P_value))
+df
+```
+::::
+
+::::column
+```{r echo=FALSE}
+Name <- c('NF_kappaB', 'Fra1',	'Fra2',	'c_Fos', 'Ki_67',	'Phospho_Fra1',	'Phospho_c_Fos', 'Phospho_p38',	'JunD', 'Phospho_S6',	'Phospho_c_Jun', 'Phospho_Erk1')
+P_value <- c(0,0,0,0,0,0,0,0,0,0,0,0)
+df <- tibble(data.frame(Name, P_value))
+df
+```
+::::
+
+:::
+
+## Results of Linear regression models: Sox10
+```{r fig.height=4.2, fig.width=10, warning=FALSE, include=FALSE}
+set.seed(130)
+n <- nrow(course_project)
+course_project <- course_project %>% filter(drug_id == 1, dose_id == 2, Rep ==1)
+training_indices <- sample(1:n, size=round(0.8*n)) 
+course_project1 <-course_project %>% rowid_to_column()
+train <- course_project1 %>% filter(rowid %in% training_indices) 
+y_train <- train$Sox10
+test <- course_project1 %>% filter(!(rowid %in% training_indices)) 
+y_test <- test$Sox10
+
+model1_train <- lm(Sox10 ~ ATF2, data = train)
+model2_train <- lm(Sox10 ~ ATF3, data = train)
+model3_train <- lm(Sox10 ~ ATF4, data = train)
+model4_train <- lm(Sox10 ~ ATF5, data = train)
+model5_train <- lm(Sox10 ~ Fra1, data = train)
+model6_train <- lm(Sox10 ~ Phospho_ATF2, data = train)
+model7_train <- lm(Sox10 ~ Phospho_ATF4, data = train)
+model8_train <- lm(Sox10 ~ c_Jun, data = train)
+model9_train <- lm(Sox10 ~ JunB, data = train)
+model10_train <- lm(Sox10 ~ JunD, data = train)
+model11_train <- lm(Sox10 ~ JunD, data = train)
+yhat_model1_test <- predict(model1_train, newdata=test)
+yhat_model2_test <- predict(model2_train, newdata=test)
+yhat_model3_test <- predict(model3_train, newdata=test)
+yhat_model4_test <- predict(model4_train, newdata=test)
+yhat_model5_test <- predict(model5_train, newdata=test)
+yhat_model6_test <- predict(model6_train, newdata=test)
+yhat_model7_test <- predict(model7_train, newdata=test)
+yhat_model8_test <- predict(model8_train, newdata=test)
+yhat_model9_test <- predict(model9_train, newdata=test)
+yhat_model10_test <- predict(model10_train, newdata=test)
+yhat_model11_test <- predict(model11_train, newdata=test)
+model1_test_RMSE <- sqrt(mean((y_test-yhat_model1_test)^2))
+model2_test_RMSE <- sqrt(mean((y_test-yhat_model2_test)^2))
+model3_test_RMSE <- sqrt(mean((y_test-yhat_model3_test)^2))
+model4_test_RMSE <- sqrt(mean((y_test-yhat_model4_test)^2))
+model5_test_RMSE <- sqrt(mean((y_test-yhat_model5_test)^2))
+model6_test_RMSE <- sqrt(mean((y_test-yhat_model6_test)^2))
+model7_test_RMSE <- sqrt(mean((y_test-yhat_model7_test)^2))
+model8_test_RMSE <- sqrt(mean((y_test-yhat_model8_test)^2))
+model9_test_RMSE <- sqrt(mean((y_test-yhat_model9_test)^2))
+model10_test_RMSE <- sqrt(mean((y_test-yhat_model10_test)^2))
+model11_test_RMSE <- sqrt(mean((y_test-yhat_model11_test)^2))
+
+yhat_model1_train <- predict(model1_train, newdata=train) 
+yhat_model2_train <- predict(model2_train, newdata=train) 
+yhat_model3_train <- predict(model3_train, newdata=train) 
+yhat_model4_train <- predict(model4_train, newdata=train)
+yhat_model5_train <- predict(model5_train, newdata=train)
+yhat_model6_train <- predict(model6_train, newdata=train) 
+yhat_model7_train <- predict(model7_train, newdata=train) 
+yhat_model8_train <- predict(model8_train, newdata=train)
+yhat_model9_train <- predict(model9_train, newdata=train)
+yhat_model10_train <- predict(model10_train, newdata=train) 
+yhat_model11_train <- predict(model1_train, newdata=train) 
+model1_train_RMSE <- sqrt(mean((y_train-yhat_model1_train)^2)) 
+model2_train_RMSE <- sqrt(mean((y_train-yhat_model2_train)^2)) 
+model3_train_RMSE <- sqrt(mean((y_train-yhat_model3_train)^2)) 
+model4_train_RMSE <- sqrt(mean((y_train-yhat_model4_train)^2))
+model5_train_RMSE <- sqrt(mean((y_train-yhat_model5_train)^2)) 
+model6_train_RMSE <- sqrt(mean((y_train-yhat_model6_train)^2)) 
+model7_train_RMSE <- sqrt(mean((y_train-yhat_model7_train)^2)) 
+model8_train_RMSE <- sqrt(mean((y_train-yhat_model8_train)^2))
+model9_train_RMSE <- sqrt(mean((y_train-yhat_model9_train)^2)) 
+model10_train_RMSE <- sqrt(mean((y_train-yhat_model10_train)^2)) 
+model11_train_RMSE <- sqrt(mean((y_train-yhat_model11_train)^2)) 
+
+
+mytable <- tibble(Model = c("Model 1","Model 2","Model 3","Model 4","Model 5","Model 6","Model 7","Model 8","Model 9","Model 10","Model 11"),RMSE_testdata = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE,model11_test_RMSE),RMSE_traindata = c(model1_train_RMSE,model2_train_RMSE,model3_train_RMSE,model4_train_RMSE,model5_train_RMSE,model6_train_RMSE,model7_train_RMSE,model8_train_RMSE,model9_train_RMSE,model10_train_RMSE,model11_train_RMSE))
+mytable %>% rowid_to_column() %>% ggplot() + labs(x="Model", y="RMSE") + geom_point(aes(x=rowid, y=RMSE_testdata, color="Test")) + geom_point(aes(x=rowid, y=RMSE_traindata, color="Train"))
+
+tibble(rmse_test = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE,model11_test_RMSE),
+           rmse_train = c(model1_train_RMSE,model2_train_RMSE,model3_train_RMSE,model4_train_RMSE,model5_train_RMSE,model6_train_RMSE,model7_train_RMSE,model8_train_RMSE,model9_train_RMSE,model10_train_RMSE,model11_train_RMSE)) %>% 
+  mutate(rmse_train/rmse_test)
+
+
+```
+```{r echo=FALSE, fig.height=5.5, warning=FALSE}
+mytable %>% ggplot(na.rm = TRUE) + labs(x="Model", y="RMSE") + geom_point(aes(x=Model, y=RMSE_testdata, color="Test", na.rm= TRUE)) + geom_point(aes(x=Model, y=RMSE_traindata, color="Train", na.rm = TRUE))+ggtitle("RMSE Values for Sox10")
+
+
+```
+
+## Results fo Linear regression models: NGFR
+
+```{r fig.height=4.45, fig.width=10, warning=FALSE, include=FALSE}
+set.seed(130)
+n <- nrow(course_project)
+course_project <- course_project %>% filter(drug_id == 1, dose_id == 2, Rep ==1)
+training_indices <- sample(1:n, size=round(0.8*n)) 
+course_project1 <-course_project %>% rowid_to_column()
+train <- course_project1 %>% filter(rowid %in% training_indices) 
+y_train <- train$NGFR
+test <- course_project1 %>% filter(!(rowid %in% training_indices)) 
+y_test <- test$NGFR
+
+model1_train <- lm(NGFR ~ ATF2, data = train)
+model2_train <- lm(NGFR ~ ATF3, data = train)
+model3_train <- lm(NGFR ~ ATF4, data = train)
+model4_train <- lm(NGFR ~ ATF5, data = train)
+model5_train <- lm(NGFR ~ c_Jun, data = train)
+model6_train <- lm(NGFR ~ Phospho_ATF2, data = train)
+model7_train <- lm(NGFR ~ Phospho_ATF4, data = train)
+model8_train <- lm(NGFR ~ c_Fos, data = train)
+model9_train <- lm(NGFR ~ JunB, data = train)
+model10_train <- lm(NGFR ~ JunD, data = train)
+model11_train <- lm(NGFR ~ JunD, data = train)
+yhat_model1_test <- predict(model1_train, newdata=test)
+yhat_model2_test <- predict(model2_train, newdata=test)
+yhat_model3_test <- predict(model3_train, newdata=test)
+yhat_model4_test <- predict(model4_train, newdata=test)
+yhat_model5_test <- predict(model5_train, newdata=test)
+yhat_model6_test <- predict(model6_train, newdata=test)
+yhat_model7_test <- predict(model7_train, newdata=test)
+yhat_model8_test <- predict(model8_train, newdata=test)
+yhat_model9_test <- predict(model9_train, newdata=test)
+yhat_model10_test <- predict(model10_train, newdata=test)
+yhat_model11_test <- predict(model11_train, newdata=test)
+model1_test_RMSE <- sqrt(mean((y_test-yhat_model1_test)^2))
+model2_test_RMSE <- sqrt(mean((y_test-yhat_model2_test)^2))
+model3_test_RMSE <- sqrt(mean((y_test-yhat_model3_test)^2))
+model4_test_RMSE <- sqrt(mean((y_test-yhat_model4_test)^2))
+model5_test_RMSE <- sqrt(mean((y_test-yhat_model5_test)^2))
+model6_test_RMSE <- sqrt(mean((y_test-yhat_model6_test)^2))
+model7_test_RMSE <- sqrt(mean((y_test-yhat_model7_test)^2))
+model8_test_RMSE <- sqrt(mean((y_test-yhat_model8_test)^2))
+model9_test_RMSE <- sqrt(mean((y_test-yhat_model9_test)^2))
+model10_test_RMSE <- sqrt(mean((y_test-yhat_model10_test)^2))
+model11_test_RMSE <- sqrt(mean((y_test-yhat_model11_test)^2))
+
+yhat_model1_train <- predict(model1_train, newdata=train) 
+yhat_model2_train <- predict(model2_train, newdata=train) 
+yhat_model3_train <- predict(model3_train, newdata=train) 
+yhat_model4_train <- predict(model4_train, newdata=train)
+yhat_model5_train <- predict(model5_train, newdata=train)
+yhat_model6_train <- predict(model6_train, newdata=train) 
+yhat_model7_train <- predict(model7_train, newdata=train) 
+yhat_model8_train <- predict(model8_train, newdata=train)
+yhat_model9_train <- predict(model9_train, newdata=train)
+yhat_model10_train <- predict(model10_train, newdata=train) 
+yhat_model11_train <- predict(model1_train, newdata=train) 
+model1_train_RMSE <- sqrt(mean((y_train-yhat_model1_train)^2)) 
+model2_train_RMSE <- sqrt(mean((y_train-yhat_model2_train)^2)) 
+model3_train_RMSE <- sqrt(mean((y_train-yhat_model3_train)^2)) 
+model4_train_RMSE <- sqrt(mean((y_train-yhat_model4_train)^2))
+model5_train_RMSE <- sqrt(mean((y_train-yhat_model5_train)^2)) 
+model6_train_RMSE <- sqrt(mean((y_train-yhat_model6_train)^2)) 
+model7_train_RMSE <- sqrt(mean((y_train-yhat_model7_train)^2)) 
+model8_train_RMSE <- sqrt(mean((y_train-yhat_model8_train)^2))
+model9_train_RMSE <- sqrt(mean((y_train-yhat_model9_train)^2)) 
+model10_train_RMSE <- sqrt(mean((y_train-yhat_model10_train)^2)) 
+model11_train_RMSE <- sqrt(mean((y_train-yhat_model11_train)^2)) 
+
+
+mytable <- tibble(Model = c("Model 1","Model 2","Model 3","Model 4","Model 5","Model 6","Model 7","Model 8","Model 9","Model 10","Model 11"),RMSE_testdata = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE,model11_test_RMSE),RMSE_traindata = c(model1_train_RMSE,model2_train_RMSE,model3_train_RMSE,model4_train_RMSE,model5_train_RMSE,model6_train_RMSE,model7_train_RMSE,model8_train_RMSE,model9_train_RMSE,model10_train_RMSE,model11_train_RMSE))
+mytable %>% rowid_to_column() %>% ggplot() + labs(x="Model", y="RMSE") + geom_point(aes(x=rowid, y=RMSE_testdata, color="Test")) + geom_point(aes(x=rowid, y=RMSE_traindata, color="Train"))
+
+tibble(rmse_test = c(model1_test_RMSE,model2_test_RMSE,model3_test_RMSE,model4_test_RMSE,model5_test_RMSE,model6_test_RMSE,model7_test_RMSE,model8_test_RMSE,model9_test_RMSE,model10_test_RMSE,model11_test_RMSE),
+           rmse_train = c(model1_train_RMSE,model2_train_RMSE,model3_train_RMSE,model4_train_RMSE,model5_train_RMSE,model6_train_RMSE,model7_train_RMSE,model8_train_RMSE,model9_train_RMSE,model10_train_RMSE,model11_train_RMSE)) %>% 
+  mutate(rmse_train/rmse_test)
+
+
+```
+```{r echo=FALSE, fig.height=5.4, warning=FALSE}
+mytable %>% ggplot(na.rm = TRUE) + labs(x="Model number", y="RMSE value") + geom_point(aes(x=Model, y=RMSE_testdata, color="Test", na.rm= TRUE)) + geom_point(aes(x=Model, y=RMSE_traindata, color="Train", na.rm = TRUE)) + ggtitle("RMSE values for NGFR")
+
+
+```
+```{r include=FALSE}
+data1 <- data %>% filter(drug_id == 1 & dose_id == 2 & Rep == 1)
+```
+
+```{r include=FALSE}
+time0.5 <- data1 %>% filter(Timepoint == "0.5 h")
+time2 <- data1 %>% filter(Timepoint == "2 h")
+time6 <- data1 %>% filter(Timepoint == "6 h")
+time15 <- data1 %>% filter(Timepoint == "15 h")
+time24 <- data1 %>% filter(Timepoint == "24 h")
+time72 <- data1 %>% filter(Timepoint == "72 h")
+time120 <- data1 %>% filter(Timepoint == "120 h")
+```
+
+
+## Classification Tree Results Sox10
+```{r echo=FALSE}
+timepoints <- c('0.5 h', '2 h', '6 h', '15 h', '24 h', '72 h', '120 h')
+Most_important_transcription_factor <- c("ATF4","ATF4","ATF4","ATF4","c_Fos", "c_Jun", "Fra1")
+df<- tibble(data_frame(timepoints,Most_important_transcription_factor ))
+df %>% head(7)#Most Important Transcription factors for Sox10
+```
+
+## Classification Tree Results NGRF
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+timepoints <- c('0.5 h', '2 h', '6 h', '15 h', '24 h', '72 h', '120 h')
+Most_important_transcription_factor <- c("ATF6","ATF6","ATF6","c_Fos","c_Fos", "c_Jun", "ATF2")
+df<- tibble(data_frame(timepoints,Most_important_transcription_factor ))
+df %>% head(7)#Most Important Transcription factors for NGFR
+```
+
+## Results from Correlation NGFR
+```{r echo=FALSE, fig.height=5.4}
+
+c1 <-  cor(time0.5$ATF6,time0.5$NGFR)
+c2<-  cor(time2$ATF6,time2$NGFR)
+c3<-  cor(time6$ATF6,time6$NGFR)
+c4<-  cor(time15$c_Fos,time15$NGFR)
+c5<-  cor(time24$c_Fos,time24$NGFR)
+c6<-  cor(time72$c_Jun,time72$NGFR)
+c7<-  cor(time120$ATF2,time120$NGFR)
+correlation_values <- c(c1, c2, c3, c4, c5, c6 ,c7)
+Times <- c('0.5','2 h', '6 h', '15 h', '24 h', '72 h', '120 h')
+
+dataframe1 <- tibble(data.frame(Times, correlation_values,Transcription_Factor=c("ATF6", "ATF6", "ATF6", "c_Fos", "c_Fos", "c_Jun", "ATF2")))
+
+ggplot(data = dataframe1,
+       aes(x = Times,
+           y = correlation_values)) +
+  geom_bar(aes(fill = Transcription_Factor),
+           stat = 'identity') +ggtitle("Correlation Values for NGFR at differnt timepoints") + labs(x = "Timepoints", y="Correlation Coefficents")
+```
+
+## Results from Correlation Sox10
+
+```{r echo=FALSE, fig.height=5.4}
+
+c1 <-  cor(time0.5$ATF4,time0.5$Sox10)
+c2<-  cor(time2$ATF4,time2$Sox10)
+c3<-  cor(time6$ATF4,time6$Sox10)
+c4<-  cor(time15$ATF4,time15$Sox10)
+c5<-  cor(time24$c_Fos,time24$Sox10)
+c6<-  cor(time72$c_Jun,time72$Sox10)
+c7<-  cor(time120$Fra1,time120$Sox10)
+correlation_values <- c(c1, c2, c3, c4, c5, c6 ,c7)
+Times <- c('0.5','2 h', '6 h', '15 h', '24 h', '72 h', '120 h')
+
+dataframe1 <- tibble(data.frame(Times, correlation_values,Transcription_Factor=c("ATF4","ATF4","ATF4","ATF4","c_Fos", "c_Jun", "Fra1")))
+
+ggplot(data = dataframe1,
+       aes(x = Times,
+           y = correlation_values)) +
+  geom_bar(aes(fill = Transcription_Factor),
+           stat = 'identity') +ggtitle("Correlation Values for NGFR at differnt timepoints") + labs(x = "Timepoints", y="Correlation Coefficents")
+```
+
+## Conclusion of the Two sample Hypothesis tests
+
+$H_0: \mu_{1} = \mu_{2}$
+
+$H_A :\mu_{1} \neq \mu_{2}$
+
+Since the p-values are all 0 we must reject the null hypothesis. Thus we can conclude that there is a difference between the protein values over time.
+
+Limitations: There is a possibility that we could have encountered a type one error by falsely rejecting the null hypothesis thus meaning the the transcription factors do not change over time.
+
+## Conclusion of the Regression anaylisis
+Since all the models have an RMSE values under 0.3 we can conclude that we can predict the phenotype value for Sox10 and NGFR from the transcription factors. 
+
+Bigger picture: This means that it makes it easier to determine whether the there is a high presence of the Sox10 and NGFR phenotype indicator from the transcription factors. From this we can conclude whether a cell has is likely to be a malignant melanoma cell in either the transitory or nueral-crest-like phenotypes or the good homeostasis phenotypes. 
+
+## Conclusion of the Classification tree
+
+We can see that what at the different times what the most predictive transcription factor are.
+
+This is important because the transcription factors are responsible for turning on the genes to then create these phenotype proteins thus from each timepoint we can estimate the best transcription factor that will either turn on the genes for Sox10 or NFGR thus making it easy to mark and or suppress tumors. 
+
+Thus we have begun to answer the final question on how to change the homeostasis from good to bad.
+
+## Conclusion of the Correlation 
+From the table of r values and r squared values we can see that there is a positive correlation between all of the transcription factors except ATF2
+
+What this means is that as we increase the presence of these transcription factors in these certain time points it is likely that we increase the presence of the NGFR and Sox10 protein,and in the case for Timepoint 120h if we decreace ATF2 we see an positive correlation with NGFR
+
+The reason that we believe that there is a possibility that it is causation and not correlation is that Transcription factors regulate gene expression
+
+This means that the increase in a particular Transcription factor might increase mRNA levels thus resulting in more of a specific protein
+
+Thus increasing the Transcription factors that increace NGFR will result in tumor suppression thus turning our "bad" homeostasis into "good" homeostasis
+
+Limitations: It is possible that there may be some unseen confounder that results in the correlation 
+
+
+
+
+```{r eval=FALSE, include=FALSE}
+```{undefined eval=FALSE, include=FALSE}
+# Results of Correlation model for time Point 0.5 h
+time0.5 %>%
+  ggplot(aes(x = ATF6, y = NGFR)) +
+  geom_point() + labs(x = "Level of ATF6", y = "Level of NGFR")
+```
+
+```{r eval=FALSE, include=FALSE}
+# Results of Correlation model for time Point 2 h
+time2 %>%
+  ggplot(aes(x = ATF6, y = NGFR)) +
+  geom_point() + labs(x = "Level of ATF6", y = "Level of NGFR")
+```
+
+```{r eval=FALSE, include=FALSE}
+# Results of Correlation model for time Point 6 h
+time6 %>%
+  ggplot(aes(x = ATF6, y = NGFR)) +
+  geom_point() + labs(x = "Level of ATF6", y = "Level of NGFR")
+```
+
+```{r eval=FALSE, include=FALSE}
+```{undefined eval=FALSE, include=FALSE}
+time15 %>%
+  ggplot(aes(x = c_Fos, y = NGFR)) +
+  geom_point() +labs(x = "Level of c_Fos", y = "Level of NGFR")
+```
+
+```{r eval=FALSE, include=FALSE}
+```{undefined eval=FALSE, include=FALSE}
+time24 %>%
+  ggplot(aes(x = c_Fos, y = NGFR)) +
+  geom_point()+labs(x = "Level of c_Fos", y = "Level of NGFR")
+```
+
+```{r eval=FALSE, include=FALSE}
+```{undefined eval=FALSE, include=FALSE}
+time72 %>%
+  ggplot(aes(x = c_Jun, y = NGFR)) +
+  geom_point()+labs(x = "Level of c_Jun", y = "Level of NGFR")
+```
+
+```{r eval=FALSE, include=FALSE}
+# Results of Correlation model for time Point 120 h
+time120 %>%
+  ggplot(aes(x = ATF2, y = NGFR)) +
+  geom_point()+labs(x = "Level of c_ATF2", y = "Level of NGFR")
+```
+
+```{r eval=FALSE, include=FALSE}
+timepoints <- c('0.5 h', '2 h', '6 h', '15 h', '24 h', '72 h', '120 h')
+Most_important_transcription_factor <- c("ATF4","ATF4","ATF4","ATF4","c_Fos", "c_Jun", "Fra1")
+df<- tibble(data_frame(timepoints,Most_important_transcription_factor ))
+df %>% head(7)#Most Important Transcription factors for Sox10
+```
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+timepoints <- c('0.5 h', '2 h', '6 h', '15 h', '24 h', '72 h', '120 h')
+Most_important_transcription_factor <- c("ATF6","ATF6","ATF6","c_Fos","c_Fos", "c_Jun", "ATF2")
+df<- tibble(data_frame(timepoints,Most_important_transcription_factor ))
+df %>% head(7)#Most Important Transcription factors for NGFR
+```
